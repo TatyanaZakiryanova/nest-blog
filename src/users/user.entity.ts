@@ -25,7 +25,7 @@ export class User {
   password: string;
 
   @Column({ nullable: true })
-  avatarUrl: string;
+  avatarUrl: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

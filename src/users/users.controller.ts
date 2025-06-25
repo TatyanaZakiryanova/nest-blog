@@ -7,18 +7,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<Partial<User>[]> {
     return await this.usersService.findAll();
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<User> {
-    const user = await this.usersService.findOne(+id);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user;
+  async getById(@Param('id') id: string): Promise<Partial<User>> {
+    return this.usersService.findOne(+id);
   }
 }
