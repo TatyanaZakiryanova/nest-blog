@@ -10,15 +10,20 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async findAll(): Promise<Omit<User, 'password'>[]> {
-    const users = await this.usersRepository.find();
-    return users.map(this.removePassword);
+  private removeSensitiveFields(user: User): Omit<User, 'password' | 'role'> {
+    const { password, role, ...clean } = user;
+    return clean;
   }
 
-  async findOne(id: number): Promise<Omit<User, 'password'>> {
+  async findAll(): Promise<Omit<User, 'password' | 'role'>[]> {
+    const users = await this.usersRepository.find();
+    return users.map(this.removeSensitiveFields);
+  }
+
+  async findOne(id: number): Promise<Omit<User, 'password' | 'role'>> {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    return this.removePassword(user);
+    return this.removeSensitiveFields(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -29,10 +34,5 @@ export class UsersService {
     const user = this.usersRepository.create(data);
     const saved = await this.usersRepository.save(user);
     return saved;
-  }
-
-  private removePassword(user: User): Omit<User, 'password'> {
-    const { password, ...clean } = user;
-    return clean;
   }
 }

@@ -14,6 +14,7 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { RegisterDto, registerSchema } from './dto/register-dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UsersService } from 'src/users/users.service';
+import { AuthRequest } from './types/auth-request.type';
 
 @Controller('auth')
 export class AuthController {
@@ -36,8 +37,8 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  async getMe(@Req() req: Request) {
-    const userId = req['user']?.id;
+  async getMe(@Req() req: AuthRequest) {
+    const userId = req.user?.id;
     if (!userId) throw new UnauthorizedException('Invalid token payload');
 
     const user = await this.usersService.findOne(userId);
