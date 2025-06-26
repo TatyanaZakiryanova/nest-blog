@@ -27,7 +27,9 @@ export class AuthService {
     return user;
   }
 
-  async login(dto: LoginDto) {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ user: Omit<User, 'password'>; accessToken: string }> {
     const user = await this.validateUser(dto.email, dto.password);
 
     const payload = { id: user.id, email: user.email };
@@ -41,7 +43,9 @@ export class AuthService {
     };
   }
 
-  async register(dto: RegisterDto) {
+  async register(
+    dto: RegisterDto,
+  ): Promise<{ user: Omit<User, 'password'>; accessToken: string }> {
     const exists = await this.usersService.findByEmail(dto.email);
     if (exists) throw new BadRequestException('User already exists');
 

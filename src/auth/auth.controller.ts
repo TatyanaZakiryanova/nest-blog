@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Post,
   Req,
   UnauthorizedException,
@@ -39,12 +38,10 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async getMe(@Req() req: Request) {
     const userId = req['user']?.id;
-
     if (!userId) throw new UnauthorizedException('Invalid token payload');
 
     const user = await this.usersService.findOne(userId);
 
-    const { password, ...cleanUser } = user;
-    return cleanUser;
+    return user;
   }
 }

@@ -7,12 +7,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async getAll(): Promise<Partial<User>[]> {
+  async getAll() {
     return await this.usersService.findAll();
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<Partial<User>> {
+  async getById(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 }
