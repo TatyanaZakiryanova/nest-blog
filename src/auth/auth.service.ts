@@ -13,20 +13,9 @@ import { LoginDto } from './dto/login-dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
-
-  private buildAuthResponse(user: User) {
-    const payload = { id: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
-    const { password, ...cleanUser } = user;
-
-    return {
-      user: cleanUser,
-      accessToken: token,
-    };
-  }
 
   async validateUser(email: string, pass: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
@@ -40,7 +29,16 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto.email, dto.password);
-    return this.buildAuthResponse(user);
+
+    const payload = { id: user.id, email: user.email };
+    const token = this.jwtService.sign(payload);
+
+    const { password, ...cleanUser } = user;
+
+    return {
+      user: cleanUser,
+      accessToken: token,
+    };
   }
 
   async register(dto: RegisterDto) {
@@ -55,9 +53,14 @@ export class AuthService {
       avatarUrl: dto.avatarUrl ?? null,
     });
 
-    return this.buildAuthResponse({
-      ...createdUser,
-      password: hashed,
-    } as User);
+    const payload = { id: createdUser.id, email: createdUser.email };
+    const token = this.jwtService.sign(payload);
+
+    const { password, ...cleanUser } = createdUser;
+
+    return {
+      user: cleanUser,
+      accessToken: token,
+    };
   }
 }
