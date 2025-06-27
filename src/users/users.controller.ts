@@ -7,7 +7,7 @@ export class UsersController {
 
   @Get()
   async getAll() {
-    return await this.usersService.findAll();
+    return this.usersService.findAll();
   }
 
   @Get(':id')
