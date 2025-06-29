@@ -17,7 +17,7 @@ export class UsersService {
 
   async findAll(): Promise<Omit<User, 'password' | 'role'>[]> {
     const users = await this.usersRepository.find();
-    return users.map(this.removeSensitiveFields);
+    return users.map((user) => this.removeSensitiveFields(user));
   }
 
   async findOne(id: number): Promise<Omit<User, 'password' | 'role'>> {

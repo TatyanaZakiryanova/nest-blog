@@ -32,7 +32,7 @@ export class AuthService {
   ): Promise<{ user: Omit<User, 'password' | 'role'>; accessToken: string }> {
     const user = await this.validateUser(dto.email, dto.password);
 
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email, role: user.role };
     const token = this.jwtService.sign(payload);
 
     const { password, role, ...cleanUser } = user;
@@ -57,7 +57,11 @@ export class AuthService {
       avatarUrl: dto.avatarUrl ?? null,
     });
 
-    const payload = { id: createdUser.id, email: createdUser.email };
+    const payload = {
+      id: createdUser.id,
+      email: createdUser.email,
+      role: createdUser.role,
+    };
     const token = this.jwtService.sign(payload);
 
     const { password, role, ...cleanUser } = createdUser;

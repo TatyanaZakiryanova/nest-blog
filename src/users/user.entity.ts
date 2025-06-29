@@ -1,3 +1,5 @@
+import { Post } from 'src/posts/post.entity';
+import { Comment } from 'src/comments/comment.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,8 +9,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Role } from './role.enum';
-import { Post } from 'src/posts/post.entity';
-import { Comment } from 'src/comments/comment.entity';
 
 @Entity()
 export class User {
