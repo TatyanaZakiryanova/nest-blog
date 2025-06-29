@@ -30,8 +30,8 @@ export class Post {
   @Column({ default: 0 })
   commentsCount: number;
 
-  @Column({ nullable: true })
-  imageUrl: string;
+  @Column({ type: 'varchar', nullable: true })
+  imageUrl: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
