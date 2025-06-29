@@ -39,11 +39,26 @@ export class PostsService {
   }
 
   async findOne(id: number): Promise<Post> {
+    await this.postsRepository.increment({ id }, 'viewsCount', 1);
+
     const post = await this.postsRepository.findOne({
       where: { id },
       relations: ['user'],
     });
+
     if (!post) throw new NotFoundException('Post not found');
+
+    return post;
+  }
+
+  async getPostById(id: number): Promise<Post> {
+    const post = await this.postsRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!post) throw new NotFoundException('Post not found');
+
     return post;
   }
 
@@ -81,5 +96,13 @@ export class PostsService {
     if (post.user.id !== userId) throw new ForbiddenException('Access denied');
 
     await this.postsRepository.delete(id);
+  }
+
+  async incrementCommentsCount(postId: number): Promise<void> {
+    await this.postsRepository.increment({ id: postId }, 'commentsCount', 1);
+  }
+
+  async decrementCommentsCount(postId: number): Promise<void> {
+    await this.postsRepository.decrement({ id: postId }, 'commentsCount', 1);
   }
 }
