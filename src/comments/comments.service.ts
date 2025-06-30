@@ -38,9 +38,11 @@ export class CommentsService {
     return saved;
   }
 
-  async findAll(): Promise<Comment[]> {
+  async findByPostId(postId: number): Promise<Comment[]> {
     return this.commentsRepository.find({
-      relations: ['user', 'post'],
+      where: { post: { id: postId } },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -51,7 +53,7 @@ export class CommentsService {
   ): Promise<Comment> {
     const comment = await this.commentsRepository.findOne({
       where: { id },
-      relations: ['user', 'post'],
+      relations: ['user'],
     });
 
     if (!comment) throw new NotFoundException('Comment not found');

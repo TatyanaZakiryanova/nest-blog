@@ -34,8 +34,8 @@ export class PostsController {
     @Body() dto: CreatePostDto,
     @Req() req: AuthRequest,
   ): Promise<PostResponseDto> {
-    const jwt = req.user;
-    const user = await this.usersService.findOne(jwt.id);
+    const jwtPayload = req.user;
+    const user = await this.usersService.findOne(jwtPayload.id);
     const post = await this.postsService.createPost(dto, user);
     return createPostResponse(post);
   }

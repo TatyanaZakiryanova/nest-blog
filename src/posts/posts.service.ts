@@ -35,12 +35,11 @@ export class PostsService {
   async findAll(): Promise<Post[]> {
     return this.postsRepository.find({
       relations: ['user'],
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: number): Promise<Post> {
-    await this.postsRepository.increment({ id }, 'viewsCount', 1);
-
     const post = await this.postsRepository.findOne({
       where: { id },
       relations: ['user'],
@@ -48,6 +47,7 @@ export class PostsService {
 
     if (!post) throw new NotFoundException('Post not found');
 
+    await this.incrementCommentsCount(id);
     return post;
   }
 
