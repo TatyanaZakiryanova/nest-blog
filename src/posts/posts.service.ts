@@ -34,7 +34,9 @@ export class PostsService {
 
   async findAll(): Promise<Post[]> {
     return this.postsRepository.find({
-      relations: ['user'],
+      relations: {
+        user: true,
+      },
       order: { createdAt: 'DESC' },
     });
   }
@@ -42,19 +44,23 @@ export class PostsService {
   async findOne(id: number): Promise<Post> {
     const post = await this.postsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: {
+        user: true,
+      },
     });
 
     if (!post) throw new NotFoundException('Post not found');
 
-    await this.incrementCommentsCount(id);
+    await this.incrementViewsCount(id);
     return post;
   }
 
   async getPostById(id: number): Promise<Post> {
     const post = await this.postsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: {
+        user: true,
+      },
     });
 
     if (!post) throw new NotFoundException('Post not found');
@@ -69,7 +75,9 @@ export class PostsService {
   ): Promise<Post> {
     const post = await this.postsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: {
+        user: true,
+      },
     });
 
     if (!post) throw new NotFoundException('Post not found');
@@ -89,7 +97,9 @@ export class PostsService {
   async deletePost(id: number, userId: number): Promise<void> {
     const post = await this.postsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: {
+        user: true,
+      },
     });
 
     if (!post) throw new NotFoundException('Post not found');
@@ -104,5 +114,9 @@ export class PostsService {
 
   async decrementCommentsCount(postId: number): Promise<void> {
     await this.postsRepository.decrement({ id: postId }, 'commentsCount', 1);
+  }
+
+  async incrementViewsCount(postId: number): Promise<void> {
+    await this.postsRepository.increment({ id: postId }, 'viewsCount', 1);
   }
 }

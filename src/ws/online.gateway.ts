@@ -14,7 +14,7 @@ import { Socket } from 'socket.io';
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: 'http://localhost:5173', //client url
   },
 })
 export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
