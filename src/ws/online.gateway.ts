@@ -4,6 +4,7 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketGateway,
+  WsException,
 } from '@nestjs/websockets';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
@@ -32,8 +33,7 @@ export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (!token) {
         this.logger.warn('No token provided');
-        client.disconnect();
-        return;
+        throw new WsException('No token provided');
       }
 
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
@@ -43,8 +43,7 @@ export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (!user) {
         this.logger.warn('User not found');
-        client.disconnect();
-        return;
+        throw new WsException('User not found');
       }
 
       user.isActive = true;
@@ -59,13 +58,21 @@ export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket) {
     try {
       const token = client.handshake.auth?.token;
-      if (!token) return;
+
+      if (!token) {
+        this.logger.warn('Disconnect: no token provided');
+        return;
+      }
 
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       const user = await this.usersRepository.findOne({
         where: { id: payload.id },
       });
-      if (!user) return;
+
+      if (!user) {
+        this.logger.warn('Disconnect: user not found');
+        return;
+      }
 
       user.isActive = false;
       await this.usersRepository.save(user);

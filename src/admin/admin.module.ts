@@ -6,9 +6,14 @@ import { Post } from 'src/posts/post.entity';
 import { Comment } from 'src/comments/comment.entity';
 import { AdminController } from './admin.controller';
 import { AuthModule } from 'src/auth/auth.module';
+import { PostsModule } from 'src/posts/posts.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Post, Comment]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Post, Comment]),
+    AuthModule,
+    PostsModule,
+  ],
   providers: [AdminService],
   controllers: [AdminController],
 })
