@@ -4,6 +4,7 @@ import { User } from 'src/users/user.entity';
 import { Comment } from 'src/comments/comment.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PostsService } from 'src/posts/posts.service';
 
 @Injectable()
 export class AdminService {
@@ -14,6 +15,7 @@ export class AdminService {
     private readonly postsRepository: Repository<Post>,
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
+    private readonly postsService: PostsService,
   ) {}
 
   private removeSensitiveFields(user: User): Omit<User, 'password'> {
@@ -43,7 +45,16 @@ export class AdminService {
   }
 
   async deleteComment(id: number): Promise<void> {
-    const result = await this.commentsRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException('Comment not found');
+    const comment = await this.commentsRepository.findOne({
+      where: { id },
+      relations: {
+        post: true,
+      },
+    });
+
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    await this.commentsRepository.delete(id);
+    await this.postsService.decrementCommentsCount(comment.post.id);
   }
 }
