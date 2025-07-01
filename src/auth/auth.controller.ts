@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
   Req,
   UnauthorizedException,
@@ -24,6 +25,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(200)
   @UsePipes(new ZodValidationPipe(loginSchema))
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
