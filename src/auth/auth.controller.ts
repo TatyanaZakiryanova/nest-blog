@@ -10,12 +10,12 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, loginSchema } from './dto/login-dto';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import { RegisterDto, registerSchema } from './dto/register-dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { AuthRequest } from './types/auth-request.type';
+import { LoginDto, loginSchema } from './dto/login.dto';
+import { RegisterDto, registerSchema } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {

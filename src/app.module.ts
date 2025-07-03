@@ -9,6 +9,7 @@ import { CommentsModule } from './comments/comment.module';
 import { WsModule } from './ws/ws.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { HealthController } from './app.controller';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { APP_GUARD } from '@nestjs/core';
     CommentsModule,
     WsModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_GUARD,
