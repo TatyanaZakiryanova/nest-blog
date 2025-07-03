@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -46,9 +48,28 @@ export class CommentsController {
   }
 
   @Get('posts/:id/comments')
-  async getAll(@Param('id') id: string): Promise<CommentResponseDto[]> {
-    const comments = await this.commentsService.findByPostId(+id);
-    return comments.map(createCommentResponse);
+  async getAll(
+    @Param('id') id: string,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ): Promise<{
+    data: CommentResponseDto[];
+    meta: {
+      total: number;
+      page: number;
+      lastPage: number;
+    };
+  }> {
+    const { data, meta } = await this.commentsService.findByPostId(
+      +id,
+      page,
+      limit,
+    );
+
+    return {
+      data: data.map(createCommentResponse),
+      meta,
+    };
   }
 
   @UseGuards(AuthGuard)

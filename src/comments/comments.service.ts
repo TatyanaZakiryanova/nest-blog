@@ -38,14 +38,38 @@ export class CommentsService {
     return saved;
   }
 
-  async findByPostId(postId: number): Promise<Comment[]> {
-    return this.commentsRepository.find({
+  async findByPostId(
+    postId: number,
+    page = 1,
+    limit = 10,
+  ): Promise<{
+    data: Comment[];
+    meta: {
+      total: number;
+      page: number;
+      lastPage: number;
+    };
+  }> {
+    const [data, total] = await this.commentsRepository.findAndCount({
       where: { post: { id: postId } },
+      skip: (page - 1) * limit,
+      take: limit,
       relations: {
         user: true,
       },
       order: { createdAt: 'DESC' },
     });
+
+    const lastPage = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        lastPage,
+      },
+    };
   }
 
   async updateComment(

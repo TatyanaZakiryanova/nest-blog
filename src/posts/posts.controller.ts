@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -41,9 +43,23 @@ export class PostsController {
   }
 
   @Get()
-  async getAll(): Promise<PostResponseDto[]> {
-    const posts = await this.postsService.findAll();
-    return posts.map(createPostResponse);
+  async getAll(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ): Promise<{
+    data: PostResponseDto[];
+    meta: {
+      total: number;
+      page: number;
+      lastPage: number;
+    };
+  }> {
+    const { data, meta } = await this.postsService.findAll(page, limit);
+
+    return {
+      data: data.map(createPostResponse),
+      meta,
+    };
   }
 
   @Get(':id')
