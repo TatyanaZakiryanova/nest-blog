@@ -10,6 +10,7 @@ import { WsModule } from './ws/ws.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { HealthController } from './app.controller';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { HealthController } from './app.controller';
     PostsModule,
     CommentsModule,
     WsModule,
+    UploadModule,
   ],
   controllers: [HealthController],
   providers: [
