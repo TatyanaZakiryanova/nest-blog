@@ -106,12 +106,10 @@ export class PostsService {
     if (!post) throw new NotFoundException('Post not found');
     if (post.user.id !== userId) throw new ForbiddenException('Access denied');
 
-    Object.assign(post, {
-      title: dto.title,
-      text: dto.text,
-      tags: dto.tags,
-      imageUrl: dto.imageUrl ?? null,
-    });
+    if (dto.title !== undefined) post.title = dto.title;
+    if (dto.text !== undefined) post.text = dto.text;
+    if (dto.tags !== undefined) post.tags = dto.tags;
+    if (dto.imageUrl !== undefined) post.imageUrl = dto.imageUrl;
 
     const saved = await this.postsRepository.save(post);
     return saved;

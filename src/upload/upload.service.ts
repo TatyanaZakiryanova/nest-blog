@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
@@ -14,20 +14,24 @@ export class UploadService {
   }
 
   async uploadImage(file: Express.Multer.File): Promise<{ url: string }> {
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'posts',
-          resource_type: 'image',
-        },
-        (error, result) => {
-          if (error || !result)
-            return reject(error ?? new Error('Upload failed'));
-          resolve({ url: result.secure_url });
-        },
-      );
+    try {
+      return await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'posts',
+            resource_type: 'image',
+          },
+          (error, result) => {
+            if (error || !result)
+              return reject(error ?? new Error('Upload failed'));
+            resolve({ url: result.secure_url });
+          },
+        );
 
-      Readable.from(file.buffer).pipe(uploadStream);
-    });
+        Readable.from(file.buffer).pipe(uploadStream);
+      });
+    } catch (err) {
+      throw new BadRequestException(err.message || 'Image upload failed');
+    }
   }
 }

@@ -1,0 +1,205 @@
+paths:
+  /comments/{id}:
+    patch:
+      tags:
+        - Comments
+      summary: Update a comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Comment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '200':
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/AccessError'
+        '404':
+          $ref: '#/components/responses/CommentNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Comment ID
+      responses:
+        '200':
+          description: Comment deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/AccessError'
+        '404':
+          $ref: '#/components/responses/CommentNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    CommentInput:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: New comment
+
+    Comment:
+      type: object
+      required:
+        - id
+        - text
+        - createdAt
+        - updatedAt
+        - user
+      properties:
+        id:
+          type: integer
+          example: 20
+        text:
+          type: string
+          example: New comment
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 25
+            fullName:
+              type: string
+              example: John Doe
+            avatarUrl:
+              type: string
+              nullable: true
+              example: null
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+        - error
+        - statusCode
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        statusCode:
+          type: integer
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized (token missing or invalid)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: No token provided
+            error: Unauthorized
+            statusCode: 401
+
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Validation failed for body
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: too_small
+                    message:
+                      type: string
+                      example: String must contain at least 1 character(s)
+                    path:
+                      type: array
+                      items:
+                        type: string
+                      example: ['text']
+
+    AccessError:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Access denied
+            error: 'Forbidden'
+            statusCode: 403
+
+    CommentNotFoundError:
+      description: Comment not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Comment not found
+            error: Not Found
+            statusCode: 404
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Internal server error
+            error: 'Internal Server Error'
+            statusCode: 500

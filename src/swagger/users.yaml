@@ -1,0 +1,117 @@
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: User ID
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/UserNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - fullName
+        - email
+        - createdAt
+        - updatedAt
+        - isActive
+      properties:
+        id:
+          type: integer
+          example: 25
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        isActive:
+          type: boolean
+          example: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+        - error
+        - statusCode
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        statusCode:
+          type: integer
+
+  responses:
+    UserNotFoundError:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: User not found
+            error: Not Found
+            statusCode: 404
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Internal server error
+            error: 'Internal Server Error'
+            statusCode: 500

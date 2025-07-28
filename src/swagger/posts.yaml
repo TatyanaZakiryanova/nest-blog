@@ -1,0 +1,506 @@
+paths:
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: Get all posts
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+          description: Number of posts per page
+      responses:
+        '200':
+          description: Successful retrieval of posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Posts
+      summary: Create a new post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostInput'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Get one post by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Post ID
+      responses:
+        '200':
+          description: Successful retrieval of post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          $ref: '#/components/responses/PostNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Posts
+      summary: Update a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Post ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostInput'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/AccessError'
+        '404':
+          $ref: '#/components/responses/PostNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Post ID
+      responses:
+        '200':
+          description: Post deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/AccessError'
+        '404':
+          $ref: '#/components/responses/PostNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /posts/{id}/comments:
+    get:
+      tags:
+        - Comments
+      summary: Get all comments for post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Post ID
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+          description: Number of comments per page
+      responses:
+        '200':
+          description: List of comments for the post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Comments
+      summary: Create a new comment on a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 25
+          description: Post ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '201':
+          description: Comment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/PostNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    PostInput:
+      type: object
+      required:
+        - title
+        - text
+        - tags
+      properties:
+        title:
+          type: string
+          example: Post title
+        text:
+          type: string
+          example: Post text
+        tags:
+          type: array
+          items:
+            type: string
+          example:
+            - backend
+            - node
+        imageUrl:
+          type: string
+          nullable: true
+          example: null
+
+    PostsResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    Post:
+      type: object
+      required:
+        - id
+        - title
+        - text
+        - tags
+        - viewsCount
+        - commentsCount
+        - createdAt
+        - updatedAt
+        - user
+      properties:
+        id:
+          type: integer
+          example: 25
+        title:
+          type: string
+          example: Post title
+        text:
+          type: string
+          example: Post text
+        tags:
+          type: array
+          items:
+            type: string
+          example:
+            - backend
+            - node
+        viewsCount:
+          type: integer
+        commentsCount:
+          type: integer
+        imageUrl:
+          type: string
+          nullable: true
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 25
+            fullName:
+              type: string
+              example: John Doe
+            avatarUrl:
+              type: string
+              nullable: true
+              example: null
+
+    Meta:
+      type: object
+      required:
+        - total
+        - page
+        - lastPage
+      properties:
+        total:
+          type: integer
+          example: 10
+        page:
+          type: integer
+          example: 1
+        lastPage:
+          type: integer
+          example: 10
+
+    CommentInput:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: New comment
+
+    CommentsResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        meta:
+          $ref: '#/components/schemas/CommentsMeta'
+
+    Comment:
+      type: object
+      required:
+        - id
+        - text
+        - createdAt
+        - updatedAt
+        - user
+      properties:
+        id:
+          type: integer
+          example: 20
+        text:
+          type: string
+          example: New comment
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2025-05-24T03:28:03.020Z
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 25
+            fullName:
+              type: string
+              example: John Doe
+            avatarUrl:
+              type: string
+              nullable: true
+              example: null
+
+    CommentsMeta:
+      type: object
+      required:
+        - total
+        - page
+        - lastPage
+      properties:
+        total:
+          type: integer
+          example: 10
+        page:
+          type: integer
+          example: 1
+        lastPage:
+          type: integer
+          example: 10
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+        - error
+        - statusCode
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        statusCode:
+          type: integer
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized (token missing or invalid)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: No token provided
+            error: Unauthorized
+            statusCode: 401
+
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Validation failed for body
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: too_small
+                    message:
+                      type: string
+                      example: String must contain at least 2 character(s)
+                    path:
+                      type: array
+                      items:
+                        type: string
+                      example: ['title']
+
+    AccessError:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Access denied
+            error: 'Access Denied'
+            statusCode: 403
+
+    PostNotFoundError:
+      description: Post not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Post not found
+            error: Not Found
+            statusCode: 404
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Internal server error
+            error: 'Internal Server Error'
+            statusCode: 500

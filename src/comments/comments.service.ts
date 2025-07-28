@@ -88,9 +88,7 @@ export class CommentsService {
     if (comment.user.id !== userId)
       throw new ForbiddenException('Access denied');
 
-    Object.assign(comment, {
-      text: dto.text,
-    });
+    if (dto.text !== undefined) comment.text = dto.text;
 
     const saved = await this.commentsRepository.save(comment);
     return saved;
