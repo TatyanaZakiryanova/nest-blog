@@ -129,14 +129,6 @@ export class PostsService {
     await this.postsRepository.delete(id);
   }
 
-  async incrementCommentsCount(postId: number): Promise<void> {
-    await this.postsRepository.increment({ id: postId }, 'commentsCount', 1);
-  }
-
-  async decrementCommentsCount(postId: number): Promise<void> {
-    await this.postsRepository.decrement({ id: postId }, 'commentsCount', 1);
-  }
-
   async incrementViewsCount(postId: number): Promise<void> {
     await this.postsRepository.increment({ id: postId }, 'viewsCount', 1);
   }

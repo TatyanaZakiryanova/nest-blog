@@ -4,11 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { User } from 'src/users/user.entity';
-import { PostsService } from 'src/posts/posts.service';
+import { Post } from 'src/posts/post.entity';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
-    private readonly postsService: PostsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async createComment(
@@ -24,18 +24,21 @@ export class CommentsService {
     user: Omit<User, 'password' | 'role'>,
     postId: number,
   ): Promise<Comment> {
-    const post = await this.postsService.getPostById(postId);
+    return await this.dataSource.transaction(async (manager) => {
+      const post = await manager.findOne(Post, { where: { id: postId } });
+      if (!post) throw new NotFoundException('Post not found');
 
-    const comment = this.commentsRepository.create({
-      text: dto.text,
-      user,
-      post,
+      const comment = manager.create(Comment, {
+        text: dto.text,
+        user,
+        post,
+      });
+
+      const saved = await manager.save(Comment, comment);
+      await manager.increment(Post, { id: post.id }, 'commentsCount', 1);
+
+      return saved;
     });
-
-    const saved = await this.commentsRepository.save(comment);
-    await this.postsService.incrementCommentsCount(post.id);
-
-    return saved;
   }
 
   async findByPostId(
@@ -95,19 +98,26 @@ export class CommentsService {
   }
 
   async deleteComment(id: number, userId: number): Promise<void> {
-    const comment = await this.commentsRepository.findOne({
-      where: { id },
-      relations: {
-        user: true,
-        post: true,
-      },
+    await this.dataSource.transaction(async (manager) => {
+      const comment = await manager.findOne(Comment, {
+        where: { id },
+        relations: {
+          user: true,
+          post: true,
+        },
+      });
+
+      if (!comment) throw new NotFoundException('Comment not found');
+      if (comment.user.id !== userId)
+        throw new ForbiddenException('Access denied');
+
+      await manager.delete(Comment, id);
+      await manager.decrement(
+        Post,
+        { id: comment.post.id },
+        'commentsCount',
+        1,
+      );
     });
-
-    if (!comment) throw new NotFoundException('Comment not found');
-    if (comment.user.id !== userId)
-      throw new ForbiddenException('Access denied');
-
-    await this.commentsRepository.delete(id);
-    await this.postsService.decrementCommentsCount(comment.post.id);
   }
 }
