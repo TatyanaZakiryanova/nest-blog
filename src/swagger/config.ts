@@ -10,7 +10,7 @@ const swaggerConfig: Options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: 'https://nest-blog-7ygh.onrender.com',
       },
     ],
   },
