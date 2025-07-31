@@ -23,7 +23,9 @@ export class UploadService {
           },
           (error, result) => {
             if (error || !result)
-              return reject(error ?? new Error('Upload failed'));
+              return reject(
+                error instanceof Error ? error : new Error('Upload failed'),
+              );
             resolve({ url: result.secure_url });
           },
         );
@@ -31,7 +33,9 @@ export class UploadService {
         Readable.from(file.buffer).pipe(uploadStream);
       });
     } catch (err) {
-      throw new BadRequestException(err.message || 'Image upload failed');
+      const error =
+        err instanceof Error ? err : new Error('Image upload failed');
+      throw new BadRequestException(error.message);
     }
   }
 }

@@ -10,7 +10,7 @@ import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtPayload } from 'src/auth/types/jwt-payload.type';
-import { Socket } from 'socket.io';
+import { AuthenticatedSocket } from './types';
 
 @Injectable()
 @WebSocketGateway({
@@ -27,9 +27,9 @@ export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async handleConnection(client: Socket) {
+  async handleConnection(client: AuthenticatedSocket) {
     try {
-      const token = client.handshake.auth?.token;
+      const { token } = client.handshake.auth;
 
       if (!token) {
         this.logger.warn('No token provided');
@@ -50,14 +50,16 @@ export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.usersRepository.save(user);
       this.logger.log(`User ${user.id} is now ONLINE`);
     } catch (err) {
-      this.logger.error('Socket connection error:', err.message);
+      const error =
+        err instanceof Error ? err : new Error('Unknown socket error');
+      this.logger.error('Socket connection error:', error.message);
       client.disconnect();
     }
   }
 
-  async handleDisconnect(client: Socket) {
+  async handleDisconnect(client: AuthenticatedSocket) {
     try {
-      const token = client.handshake.auth?.token;
+      const { token } = client.handshake.auth;
 
       if (!token) {
         this.logger.warn('Disconnect: no token provided');
@@ -78,7 +80,9 @@ export class OnlineGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.usersRepository.save(user);
       this.logger.log(`User ${user.id} is now OFFLINE`);
     } catch (err) {
-      this.logger.error('Socket disconnect error:', err.message);
+      const error =
+        err instanceof Error ? err : new Error('Unknown socket error');
+      this.logger.error('Socket disconnect error:', error.message);
     }
   }
 }
