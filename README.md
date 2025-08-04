@@ -2,10 +2,13 @@
 
 **Backend API for a blog built with NestJS, PostgreSQL, and TypeORM.** Includes JWT authentication, role-based access control, cloud file uploads, and WebSocket support for real-time features.
 
+[README на русском](./README.ru.md)
+
 ## API docs
 
 ⚠️ _Please note: free Render server may take up to 1 minute to wake up on first request._
-[Swagger docs](https://nest-blog-7ygh.onrender.com/docs)
+
+[Swagger docs](https://nest-blog-7ygh.onrender.com/docs)  
 _To access protected routes, register via `/auth/register`, then use your JWT token via the "Authorize" field in Swagger._
 
 ## 🛠️ Technologies
@@ -16,7 +19,7 @@ _To access protected routes, register via `/auth/register`, then use your JWT to
 - **bcrypt** – password hashing
 - **Multer + Cloudinary** – image uploads
 - **Zod** – input validation
-- **@nestjs/config**, **dotenv** - environment configuration
+- **nestjs/config**, **dotenv** - environment configuration
 - **Neon, Render** – deployment
 - **Swagger** – API documentation
 
