@@ -4,24 +4,24 @@
 
 [README на русском](./README.ru.md)
 
-## API docs
+## 🌐 API docs
 
 ⚠️ _Please note: free Render server may take up to 1 minute to wake up on first request._
 
 [Swagger docs](https://nest-blog-7ygh.onrender.com/docs)  
-_To access protected routes, register via `/auth/register`, then use your JWT token via the "Authorize" field in Swagger._
+_To test protected routes, register via `/auth/register`, then paste the received JWT token into the "Authorize" field in Swagger._
 
 ## 🛠️ Technologies
 
 - **Node.js + Nest.js**
 - **PostgreSQL** (TypeORM)
-- **JWT** – authentication and authorization
-- **bcrypt** – password hashing
-- **Multer + Cloudinary** – image uploads
-- **Zod** – input validation
+- **JWT** - authentication and authorization
+- **bcrypt** - password hashing
+- **Multer + Cloudinary** - image uploads
+- **Zod** - input validation
 - **nestjs/config**, **dotenv** - environment configuration
-- **Neon, Render** – deployment
-- **Swagger** – API documentation
+- **Neon, Render** - deployment
+- **Swagger** - API documentation
 
 ## 💻 Features
 
@@ -62,13 +62,13 @@ _To access protected routes, register via `/auth/register`, then use your JWT to
 
 ### Мedia
 
-- Image uploads using **Multer + Cloudinary**.
+- Image uploads using **Multer + Cloudinary**
 
 #### File Upload explained
 
-- Frontend sends a **multipart/form-data** POST request with an image under the image field.
-- NestJS controller uses **built-in validators** (max size, file type) via **ParseFilePipe**.
-- Controller passes the file `Express.Multer.File` to the **UploadService**.
+- Frontend sends a **multipart/form-data** POST request with an image under the image field
+- NestJS controller uses **built-in validators** (max size, file type) via **ParseFilePipe**
+- Controller passes the file `Express.Multer.File` to the **UploadService**
 - **UploadService**:
   - Converts the file's **buffer** to a **readable stream**: `Readable.from(file.buffer)`
   - Sends that stream to **Cloudinary's upload_stream**
