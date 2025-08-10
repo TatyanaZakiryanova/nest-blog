@@ -1,12 +1,13 @@
 # Nest Blog
 
-**Backend API блога на NestJS, PostgreSQL и TypeORM**. Включает JWT-аутентификацию, RBAC, загрузку файлов в облако, WebSocket-соединения для realtime-функциональности.
+**Backend API блога на NestJS, PostgreSQL и TypeORM**. Включает **JWT-аутентификацию**, **RBAC**, **загрузку файлов** в облако, **WebSocket-соединения** для realtime-функциональности.
 
 ⚠️ _Первая загрузка сервера на Render может занять до 1 минуты. Пожалуйста, подождите_
 
 ## 🔗 Quick Links
 
-[**Swagger docs**](https://nest-blog-7ygh.onrender.com/docs)_(use `/auth/register` to get tokens)_  
+[**Swagger docs**](https://nest-blog-7ygh.onrender.com/docs)_(use `/auth/register` to get tokens)_
+
 [**README на русском**](./README.ru.md)
 
 ## 🛠️ Technologies
