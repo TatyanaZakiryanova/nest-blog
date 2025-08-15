@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
-import swaggerConfig from './swagger/config';
+import swaggerConfig from './config/swagger-config';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc = require('swagger-jsdoc');
 

@@ -88,6 +88,7 @@ src/
 ├── auth/
 ├── comments/
 ├── common/
+├── config/
 ├── posts/
 ├── seed/
 ├── swagger/
